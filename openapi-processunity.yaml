@@ -1,0 +1,488 @@
+openapi: 3.0.3
+info:
+  title: ProcessUnity Web Services API (derived from Swagger PDF)
+  version: "1.0.0"
+  description: |
+    A functional OpenAPI spec assembled from the "ProcessUnity Web Services API Swagger Documentation v1" PDF.
+    This is a best-effort conversion based on the visible endpoints and example payloads in the document.
+    You should replace placeholder descriptions, servers, security schemes, and schemas with your real values.
+servers:
+  - url: https://api.processunity.example.com
+    description: Replace with your actual API host.
+tags:
+  - name: AttachedFiles
+  - name: DataExchange
+  - name: ImportExport
+paths:
+  /apiv2/AttachedFiles/{objectId}/FileNames:
+    get:
+      tags: [AttachedFiles]
+      summary: Returns a list of file names attached to a specified object.
+      parameters:
+        - name: objectId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /apiv2/AttachedFiles/{objectId}:
+    get:
+      tags: [AttachedFiles]
+      summary: Returns files attached to a specified object.
+      parameters:
+        - name: objectId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: filenames
+          in: query
+          description: Optional list of file names to return.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: zipContent
+          in: query
+          description: If true, the resulting files are zipped into a single file.
+          required: false
+          schema:
+            type: boolean
+        - name: relationships
+          in: query
+          description: Optional related object IDs.
+          required: false
+          schema:
+            type: array
+            items:
+              type: integer
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+                example:
+                  - Content: "string"
+                    ContentLength: 0
+                    FileName: "string"
+    post:
+      tags: [AttachedFiles]
+      summary: Creates new attachments on a specified object.
+      description: Returns a list of attached file names; if `Prefer:return=full` is set, full file content is included.
+      parameters:
+        - name: objectId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: unzip
+          in: query
+          description: If true, zip files will be unzipped and contents added to the object.
+          required: false
+          schema:
+            type: boolean
+        - name: objectTypeId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: relationship
+          in: query
+          required: false
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  description: Base64-encoded file content.
+                contentLength:
+                  type: integer
+                fileName:
+                  type: string
+              required: [content, fileName]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /apiv2/AttachedFiles:
+    post:
+      tags: [AttachedFiles]
+      summary: Copy file functionality (server-side copy without download/upload).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                copyFileRequest:
+                  type: object
+                  additionalProperties: true
+              required: [copyFileRequest]
+            example:
+              copyFileRequest:
+                source:
+                  objectTypeId: 0
+                  objectId: 0
+                target:
+                  objectTypeId: 0
+                  objectId: 0
+                fileFilters: []
+                fileSources: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/AttachedFiles/APILogHelper:
+    post:
+      tags: [AttachedFiles]
+      summary: Helper to log API user info (as seen in PDF).
+      parameters:
+        - name: duration
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: APIInfo
+          in: query
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+            example:
+              { "id": 0, "clientIP": "string", "claims": {}, "subject": "string", "authenticationType": "string" }
+      responses:
+        '204':
+          description: No Content
+  /api/dataexchange/ExportableReports/{reportId}:
+    get:
+      tags: [DataExchange]
+      summary: Get exportable reports.
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportListResponse'
+  /api/dataexchange/RemoteExportableReports/{reportId}:
+    get:
+      tags: [DataExchange]
+      summary: Get remote exportable reports.
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportListResponse'
+  /api/dataexchange/ImportableTemplates/{importTemplateId}:
+    get:
+      tags: [DataExchange]
+      summary: Get importable templates.
+      parameters:
+        - name: importTemplateId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateListResponse'
+  /api/dataexchange/RemoteImportableTemplates/{importTemplateId}:
+    get:
+      tags: [DataExchange]
+      summary: Get remote importable templates.
+      parameters:
+        - name: importTemplateId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateListResponse'
+  /api/importexport/Export/{reportId}:
+    post:
+      tags: [ImportExport]
+      summary: Export report data.
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                param:
+                  type: object
+                  additionalProperties: true
+              required: [param]
+            example:
+              param:
+                filters:
+                  - columnName: "string"
+                    values: ["string"]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageDataResponse'
+  /api/importexport/Import/{importTemplateId}:
+    post:
+      tags: [ImportExport]
+      summary: Import data for a given template.
+      parameters:
+        - name: importTemplateId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                importParamObject:
+                  type: object
+                  additionalProperties: true
+              required: [importParamObject]
+            example:
+              importParamObject:
+                data: []
+                params: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  TotalRecords:
+                    type: integer
+                  TotalReadyRecords:
+                    type: integer
+                  TotalErrorRecords:
+                    type: integer
+                  TotalNoActionRecords:
+                    type: integer
+                  TotalInsertRecords:
+                    type: integer
+                  TotalUpdateRecords:
+                    type: integer
+                  TotalDeleteRecords:
+                    type: integer
+                additionalProperties: true
+  /api/importexport/GetColumns/{oidObjectInstance}:
+    get:
+      tags: [ImportExport]
+      summary: Get columns for an object instance.
+      parameters:
+        - name: oidObjectInstance
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Name: { type: string }
+                  ExternalID: { type: string }
+                  Description: { type: string }
+                  SuppressResults: { type: boolean }
+                  GuidSets: { type: array, items: { type: string } }
+                  ReportColumnColumns: { type: array, items: { type: string } }
+                additionalProperties: true
+  /api/importexport/ImportWithResults/{oidObjectInstance}:
+    post:
+      tags: [ImportExport]
+      summary: Import data and return results.
+      parameters:
+        - name: oidObjectInstance
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                importParamObject:
+                  type: object
+                  additionalProperties: true
+              required: [importParamObject]
+            example:
+              importParamObject:
+                data: []
+                params: {}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Import: { type: object, additionalProperties: true }
+                  Results: { type: object, additionalProperties: true }
+                  Complete: { type: boolean }
+                  Errors: { type: boolean }
+                additionalProperties: true
+  /api/importexport/GetReportColumns/{oidObjectInstance}:
+    get:
+      tags: [ImportExport]
+      summary: Get report columns for an object instance.
+      parameters:
+        - name: oidObjectInstance
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+components:
+  schemas:
+    MessageDataResponse:
+      type: object
+      properties:
+        Message:
+          type: string
+        HasErrors:
+          type: boolean
+        Data:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    ReportListResponse:
+      type: object
+      properties:
+        Message:
+          type: string
+        HasErrors:
+          type: boolean
+        Data:
+          type: array
+          items:
+            type: object
+            properties:
+              Id:
+                type: integer
+              Name:
+                type: string
+            additionalProperties: true
+    TemplateListResponse:
+      type: object
+      properties:
+        Message:
+          type: string
+        HasErrors:
+          type: boolean
+        Data:
+          type: array
+          items:
+            type: object
+            properties:
+              Id:
+                type: integer
+              Name:
+                type: string
+              Inserts:
+                type: boolean
+              Updates:
+                type: boolean
+              ImportType:
+                type: string
+            additionalProperties: true
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+security:
+  - ApiKeyAuth: []
