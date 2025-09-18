@@ -1,0 +1,29 @@
+name: OpenAPI Docs
+on:
+  push:
+    branches: [main]
+    paths: ["openapi.yaml", ".github/workflows/docs.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm i -D @redocly/cli
+      - run: npx @redocly/cli build-docs openapi.yaml -o site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/deploy-pages@v4
