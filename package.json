@@ -1,0 +1,15 @@
+{
+  "name": "processunity-openapi",
+  "private": true,
+  "scripts": {
+    "lint": "spectral lint docs/openapi.yaml",
+    "preview": "redocly preview-docs docs/openapi.yaml",
+    "mock": "prism mock docs/openapi.yaml -p 4010",
+    "build:docs": "redocly build-docs docs/openapi.yaml -o site"
+  },
+  "devDependencies": {
+    "@stoplight/spectral-cli": "^6.11.0",
+    "@redocly/cli": "^1.16.0",
+    "@stoplight/prism-cli": "^5.8.0"
+  }
+}
